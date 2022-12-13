@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
         @Id
         @GeneratedValue()
         private int id;
-        private String empCode;
+        private String empId;
         private String year;
         private int casualLeave;
         private int sickLeave;
@@ -20,9 +20,9 @@ import jakarta.persistence.Table;
         public Leaves1() {
         }
 
-        public Leaves1(int id, String empCode, String year, int casualLeave, int sickLeave, int specialLeave) {
+        public Leaves1(int id, String empId, String year, int casualLeave, int sickLeave, int specialLeave) {
             this.id = id;
-            this.empCode = empCode;
+            this.empId = empId;
             this.year = year;
             this.casualLeave = casualLeave;
             this.sickLeave = sickLeave;
@@ -37,12 +37,12 @@ import jakarta.persistence.Table;
             this.id = id;
         }
 
-        public String getEmpCode() {
-            return empCode;
+        public String getEmpId() {
+            return empId;
         }
 
-        public void setEmpCode(String empCode) {
-            this.empCode = empCode;
+        public void setEmpId(String empId) {
+            this.empId = empId;
         }
 
         public String getYear() {
@@ -77,5 +77,3 @@ import jakarta.persistence.Table;
             this.specialLeave = specialLeave;
         }
     }
-
-

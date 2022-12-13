@@ -1,6 +1,8 @@
 package com.example.NestDigitalApp.Dao;
 
 import com.example.NestDigitalApp.Model.Leave;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -15,4 +17,8 @@ public interface LeaveDao extends CrudRepository<Leave,Integer>
 
     @Query(value = "SELECT `id`, `apply_date`, `emp_id`, `from_date`, `leave_status`, `leave_type`, `remarks`, `to_date` FROM `leave2` WHERE `emp_id`= :id", nativeQuery = true)
     List<Leave> GetEmployeeLeaves(@Param("id") int id);
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE `leave2` SET `leave_status`= :status WHERE `id`= :id", nativeQuery = true)
+    void UpdateLeaves(@Param("id") int id, @Param("status") int status);
 }

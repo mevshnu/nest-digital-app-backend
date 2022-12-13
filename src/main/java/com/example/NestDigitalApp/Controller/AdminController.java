@@ -24,15 +24,28 @@ public class AdminController {
     @Autowired
     private SecurityDao sdao;
 
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy");
 
-    @CrossOrigin(origins = "*")
-    @PostMapping(path="/addEmployee",consumes = "application/json",produces = "application/json")
-    public HashMap<String,String> AddEmployee(@RequestBody Employee emp)
-    {
-        empdao.save(emp);
-        HashMap<String,String> status = new HashMap<>();
-        status.put("status","success");
-        return status;
+    @PostMapping (path = "/addEmployee", consumes = "application/json", produces = "application/json")
+    public HashMap<String, String> AddEmployee(@RequestBody Employee emp){
+        List<Employee> emp1 = (List<Employee>) empdao.UserLoginDetailsByCred(emp.getUsername(), emp.getPassword(), emp.getEmpCode());
+        HashMap<String, String> hashMap = new HashMap<>();
+        if(emp1.size()==0){
+            LocalDateTime now = LocalDateTime.now();
+            empdao.save(emp);
+            List<Employee> result = (List<Employee>) empdao.UserLoginDetailsById(emp.getEmpCode());
+            Leaves1 l1 = new Leaves1();
+            l1.setEmpId(String.valueOf(result.get(0).getId()));
+            l1.setYear(dtf.format(now));
+            l1.setCasualLeave(20);
+            l1.setSickLeave(7);
+            l1.setSpecialLeave(3);
+            l1dao.save(l1);
+            hashMap.put("status","success");
+        }else{
+            hashMap.put("status","failed");
+        }
+        return hashMap;
     }
 
     @CrossOrigin(origins="*")
@@ -50,8 +63,16 @@ public class AdminController {
         hashMap.put("status", "success");
         return hashMap;
     }
+    @CrossOrigin(origins = "*")
+    @PostMapping(path = "/deleteEmployee", consumes = "application/json", produces = "application/json")
+    public HashMap<String, String> DeleteEmployee(@RequestBody Employee emp){
+        empdao.DeleteEmployee(emp.getId());
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("status","success");
+        return hashMap;
+    }
     @GetMapping("/viewAllEmployee")
-    public List<Employee> GetAllEmployee(){
+    public List<Employee> viewAllEmployee(){
         return (List<Employee>) empdao.findAll();
     }
 
