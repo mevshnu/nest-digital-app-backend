@@ -6,29 +6,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "employee")
-public class Employee {
+@Table (name="security")
+public class Security {
     @Id
-    @GeneratedValue()
+    @GeneratedValue
     private int id;
-    private String empCode;
     private String name;
     private String email;
     private String phone;
-    private String designation;
     private String username;
     private String password;
 
-    public Employee() {
+    public Security() {
     }
 
-    public Employee(int id, String empCode, String name, String email, String phone, String designation, String username, String password) {
+    public Security(int id, String name, String email, String phone, String username, String password) {
         this.id = id;
-        this.empCode = empCode;
         this.name = name;
         this.email = email;
         this.phone = phone;
-        this.designation = designation;
         this.username = username;
         this.password = password;
     }
@@ -39,14 +35,6 @@ public class Employee {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getEmpCode() {
-        return empCode;
-    }
-
-    public void setEmpCode(String empCode) {
-        this.empCode = empCode;
     }
 
     public String getName() {
@@ -71,14 +59,6 @@ public class Employee {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getDesignation() {
-        return designation;
-    }
-
-    public void setDesignation(String designation) {
-        this.designation = designation;
     }
 
     public String getUsername() {
