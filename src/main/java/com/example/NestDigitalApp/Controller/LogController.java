@@ -1,18 +1,13 @@
 package com.example.NestDigitalApp.Controller;
 
-import com.example.NestDigitalApp.Dao.EmployeeDao;
-import com.example.NestDigitalApp.Dao.Leave1Dao;
-import com.example.NestDigitalApp.Dao.LogDao;
-import com.example.NestDigitalApp.Dao.VisitorsLogDao;
+import com.example.NestDigitalApp.Dao.*;
 import com.example.NestDigitalApp.Model.Employee;
 import com.example.NestDigitalApp.Model.Leave;
 import com.example.NestDigitalApp.Model.VisitorLog;
 import com.example.NestDigitalApp.Model.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -24,34 +19,37 @@ public class LogController {
 
 
     @Autowired
+    private LogDao ldao;
+    @Autowired
     private EmployeeDao empdao;
     @Autowired
     private VisitorsLogDao vldao;
     @Autowired
     private Leave1Dao l1dao;
+
     @Autowired
-    private LogDao ldao;
+    private LeaveDao lvdao;
 
     DateTimeFormatter tf = DateTimeFormatter.ofPattern("HH:mm:ss");
     DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy/MM/dd");
     DateTimeFormatter rev_df = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-
     @CrossOrigin(origins = "*")
-    @PostMapping(path = "/addEmpEntryLog",produces = "application/json",consumes = "application/json")
+    @PostMapping(path = "/addEmpEntryLog")
     public HashMap<String, String> addEmpEntryLogs(@RequestBody Log l){
         LocalDateTime now = LocalDateTime.now();
         List<Employee> emp = (List<Employee>) empdao.UserLoginDetailsById(l.getEmpCode());
-        System.out.println(emp.get(0).getId());
         HashMap<String, String> hashMap = new HashMap<>();
         if(emp.size()==0){
             hashMap.put("status","failed");
         }else{
-            List<Leave> result = (List<Leave>) l1dao.GetLeaveUpdates(emp.get(0).getId(),df.format(now));
-            if(result.size()==0 || result.get(0).getLeaveStatus()!=1){
+            String[] temp_date = rev_df.format(now).split("/",3);
+            String date = temp_date[2]+"-"+temp_date[1]+"-"+temp_date[0];
+            List<Map<String,String>> result = (List<Map<String,String>>) lvdao.GetLeaveUpdates(emp.get(0).getId(),date);
+            System.out.println(result.size());
+            if(result.size()==0){
                 l.setEmpId(emp.get(0).getId());
                 l.setDate(String.valueOf(df.format(now)));
-                l.setEntryTime(tf.format(now));
+                l.setEntryTime(String.valueOf(tf.format(now)));
                 ldao.save(l);
                 hashMap.put("status","success");
             }else{
@@ -98,5 +96,39 @@ public class LogController {
         vldao.UpdateExitEntry(vl.getPhone(), vl.getExitTime());
         hashMap.put("status","success");
         return hashMap;
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping(path = "/viewEmpLog")
+    public List<Log> ViewEmpLog(@RequestBody Log vl){
+        return ldao.GetEmpLog(vl.getEmpId());
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/viewSecEmpLog")
+    public List<Map<String,String>> ViewSecEmpLog(){
+        return ldao.GetSecEmpLog();
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/viewSecVisLog")
+    public List<VisitorLog> ViewSecVisLog(){
+        return (List<VisitorLog>) vldao.findAll();
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping(path = "/searchEmpLog")
+    public List<Map<String, String>> SearchEmpLog(@RequestBody Log vl){
+        String[] date_arr = vl.getDate().split("-",3);
+        String date = date_arr[0]+"/"+date_arr[1]+"/"+date_arr[2];
+        return ldao.SearchEmpLog(date);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping(path = "/searchVisLog")
+    public List<VisitorLog> SearchVisLog(@RequestBody Log vl){
+        String[] date_arr = vl.getDate().split("-",3);
+        String date = date_arr[0]+"/"+date_arr[1]+"/"+date_arr[2];
+        return vldao.SearchVisLog(date);
     }
 }

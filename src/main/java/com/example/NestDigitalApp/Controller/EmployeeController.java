@@ -5,10 +5,7 @@ import com.example.NestDigitalApp.Model.Employee;
 import com.example.NestDigitalApp.Model.Leaves1;
 import com.example.NestDigitalApp.Model.Security;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -20,6 +17,13 @@ public class EmployeeController {
     @Autowired
     private EmployeeDao empdao;
 
+    @CrossOrigin(origins = "*")
+    @GetMapping("/")
+    public String HomeRoute(){
+        return "Welcome to Nest Digital App";
+    }
+
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/employeeLogin", consumes = "application/json", produces = "application/json")
     public HashMap<String, String> EmployeeLogin(@RequestBody Employee emp){
         HashMap<String, String> hashMap = new HashMap<>();
@@ -32,12 +36,11 @@ public class EmployeeController {
         }
         return hashMap;
     }
+
     @CrossOrigin(origins = "*")
-    @PostMapping(path = "/viewemployee", consumes = "application/json", produces = "application/json")
-    public List<Employee> ViewEmployee(@RequestBody Employee em)
-    {
-        System.out.println(em.getId());
-        return (List<Employee>) empdao.GetEmployeeProfile(em.getId());
+    @PostMapping(path = "/employeeProfile", consumes = "application/json", produces = "application/json")
+    public List<Employee> getEmployeeProfile(@RequestBody Employee emp){
+        return (List<Employee>) empdao.GetEmployeeProfile(emp.getId());
     }
 
 }
